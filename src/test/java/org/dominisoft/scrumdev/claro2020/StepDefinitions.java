@@ -88,7 +88,7 @@ public final class StepDefinitions {
     driver = new FirefoxDriver(options);
 
 //		ChromeOptions options = new ChromeOptions().setHeadless(true);
-//		driver = new ChromeDriver(options);
+//		driver = new ChromeDriver(options); dummy change to test scm
   }
 
   @After
