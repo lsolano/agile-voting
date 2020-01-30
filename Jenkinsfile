@@ -7,11 +7,14 @@ pipeline {
     stages {
 
         stage ('Build') {
-            steps {
-                sh '''#!/bin/bash
-                	mvn -Dmaven.test.failure.ignore=true site
-                   ''' 
-            }
+            withMaven(
+		        // Maven installation declared in the Jenkins "Global Tool Configuration"
+		        maven: 'Maven 3.3.9') {
+		 
+		      // Run the maven build
+		      sh "mvn clean verify"
+		 
+		    } // withMaven will discover the generated Maven artifacts, JUnit Surefire & FailSafe & FindBugs & SpotBugs reports...
             post {
                 success {
                     junit 'target/surefire-reports/**/*.xml' 
