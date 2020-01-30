@@ -5,14 +5,6 @@ pipeline {
         jdk 'jdk12'
     }
     stages {
-        stage ('Initialize') {
-            steps {
-                sh '''#!/bin/bash
-                    echo "PATH = ${PATH}"
-                    echo "M2_HOME = ${M2_HOME}"
-                '''
-            }
-        }
 
         stage ('Build') {
             steps {
