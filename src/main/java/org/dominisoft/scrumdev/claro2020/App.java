@@ -1,6 +1,14 @@
 package org.dominisoft.scrumdev.claro2020;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.mitchellbosecke.pebble.PebbleEngine;
+import com.mitchellbosecke.pebble.loader.ClasspathLoader;
+
 import io.javalin.Javalin;
+import io.javalin.plugin.rendering.JavalinRenderer;
+import io.javalin.plugin.rendering.template.JavalinPebble;
 
 /**
  * Hello world.
@@ -42,16 +50,23 @@ public final class App {
         System.out.println("Server is gone!");
       });
     });
+    
+    JavalinRenderer.register(JavalinPebble.INSTANCE, ".peb", ".pebble");
+    PebbleEngine engine = new PebbleEngine.Builder().loader(new ClasspathLoader()).build();
+    JavalinPebble.configure(engine);
 
     app.post("/init-voting", ctx -> {
-      ctx.contentType("text/html; charset=UTF-8");
-      final String rawCedula = ctx.req.getParameter("id");
+      //ctx.contentType("text/html; charset=UTF-8");
+      //final String rawCedula = ctx.req.getParameter("id");
 
       // DopNationalIdentificationNumber cedula2 = new
       // DopNationalIdentificationNumber(rawCedula);
 
-      ctx.result(
-          String.format("TODO: Validate ID '%s' (Cédula)!!!", rawCedula));
+//      ctx.result(
+//          String.format("TODO: Validate ID '%s' (Cédula)!!!", rawCedula));
+      Map<String, Object> model = new HashMap<String, Object>();
+      model.put("PebbleMessage", "Hola Equipo BBBB!!!");
+      ctx.render("hello-world.pebble", model);
     });
 
     app.after(ctx -> {
