@@ -34,6 +34,12 @@ public final class App {
    * @param args Console arguments
    */
   public static void main(final String[] args) {
+    configureWebApp();
+    
+    mapRoutes();
+  }
+
+  private static void configureWebApp() {
     app = Javalin.create(config -> {
       config.addStaticFiles("/html");
     }).start(DEFAULT_PORT);
@@ -51,10 +57,30 @@ public final class App {
       });
     });
     
+    app.after(ctx -> {
+      // run after all requests
+      final String whatHappened = ctx.req.getMethod() + " "
+          + ctx.req.getRequestURI() + " -> " + ctx.res.getStatus();
+      System.out.println("whatHappened: " + whatHappened);
+    });
+    
     JavalinRenderer.register(JavalinPebble.INSTANCE, ".peb", ".pebble");
-    PebbleEngine engine = new PebbleEngine.Builder().loader(new ClasspathLoader()).build();
+    PebbleEngine engine = new PebbleEngine.Builder()
+        .loader(new ClasspathLoader())
+        .cacheActive(true)
+        .build();
     JavalinPebble.configure(engine);
-
+  }
+  
+  private static void mapRoutes() {
+    app.get("", ctx -> {
+      ctx.redirect("/index.html");
+    });
+    
+    app.get("/index.html", ctx -> {
+      ctx.render("index.pebble");
+    });
+    
     app.post("/init-voting", ctx -> {
       //ctx.contentType("text/html; charset=UTF-8");
       //final String rawCedula = ctx.req.getParameter("id");
@@ -65,15 +91,9 @@ public final class App {
 //      ctx.result(
 //          String.format("TODO: Validate ID '%s' (Cédula)!!!", rawCedula));
       Map<String, Object> model = new HashMap<String, Object>();
-      model.put("PebbleMessage", "Hola Equipo BBBB!!!");
-      ctx.render("hello-world.pebble", model);
-    });
-
-    app.after(ctx -> {
-      // run after all requests
-      final String whatHappened = ctx.req.getMethod() + " "
-          + ctx.req.getRequestURI() + " -> " + ctx.res.getStatus();
-      System.out.println("whatHappened: " + whatHappened);
+      model.put("HasErrors", true);
+      model.put("InvalidIdMessage", "You have an invalid Cedula!");
+      ctx.render("index.pebble", model);
     });
   }
 
