@@ -35,7 +35,7 @@ public final class App {
    */
   public static void main(final String[] args) {
     configureWebApp();
-    
+
     mapRoutes();
   }
 
@@ -56,34 +56,38 @@ public final class App {
         System.out.println("Server is gone!");
       });
     });
-    
+
     app.after(ctx -> {
       // run after all requests
-      final String whatHappened = ctx.req.getMethod() + " "
-          + ctx.req.getRequestURI() + " -> " + ctx.res.getStatus();
+      final String whatHappened = ctx.req.getMethod() + " " + ctx.req.getRequestURI() + " -> " + ctx.res.getStatus();
+
       System.out.println("whatHappened: " + whatHappened);
     });
-    
+
+    app.exception(Exception.class, (e, ctx) -> {
+      // handle general exceptions here
+      // will not trigger if more specific exception-mapper found
+      System.out.println("whatHappened: " + e);
+      e.printStackTrace(System.err);
+    });
+
     JavalinRenderer.register(JavalinPebble.INSTANCE, ".peb", ".pebble");
-    PebbleEngine engine = new PebbleEngine.Builder()
-        .loader(new ClasspathLoader())
-        .cacheActive(true)
-        .build();
+    PebbleEngine engine = new PebbleEngine.Builder().loader(new ClasspathLoader()).cacheActive(true).build();
     JavalinPebble.configure(engine);
   }
-  
+
   private static void mapRoutes() {
     app.get("", ctx -> {
       ctx.redirect("/index.html");
     });
-    
+
     app.get("/index.html", ctx -> {
       ctx.render("index.pebble");
     });
-    
+
     app.post("/init-voting", ctx -> {
-      //ctx.contentType("text/html; charset=UTF-8");
-      //final String rawCedula = ctx.req.getParameter("id");
+      // ctx.contentType("text/html; charset=UTF-8");
+      // final String rawCedula = ctx.req.getParameter("id");
 
       // DopNationalIdentificationNumber cedula2 = new
       // DopNationalIdentificationNumber(rawCedula);
